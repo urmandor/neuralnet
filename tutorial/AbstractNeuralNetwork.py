@@ -25,11 +25,11 @@ class AbstractNeuralNetwork(ABC):
             returns: 
             parameters - dictionary containing all the 'Weights' & 'biases' for each layer.
         """
-
+        np.random.seed(1)
         parameters = {}
         L = len(layerdims)
         for l in range(1, L):
-            parameters["W" + str(l)] = np.random.randn(layerdims[l], layerdims[l-1]) * 0.01
+            parameters["W" + str(l)] = np.random.randn(layerdims[l], layerdims[l-1]) / np.sqrt(layerdims[l-1]) # * 0.01
             parameters["b" + str(l)] = np.zeros((layerdims[l], 1))
 
         return parameters
@@ -252,13 +252,19 @@ class AbstractNeuralNetwork(ABC):
     
     
     def startTraining(self, X, Y, layerdims=None, activations=None, learningRate=0.0075, numIterations=3000, printCost=False, printInterval=100):
-        
+
+        np.random.seed(1)        
         costs = []
 
         layerdims = layerdims or self.layerdims
         activations = activations or self.activations
 
         parameters = self.initializeParams(layerdims)
+
+        # print(layerdims)
+        # print(activations)
+        # print(learningRate)
+        # print(parameters["W1"]) 
 
         for i in range(0, numIterations):
             yHat, caches = self.forwardPropagation(X, parameters, copy.deepcopy(activations))
@@ -329,8 +335,3 @@ class AbstractNeuralNetwork(ABC):
     def normalizeData(self, maxValue=255):
         self.trainX = self.trainX/maxValue
         self.testX = self.testX and self.testX/maxValue
-
-
-    def testNetwork(self):
-        np.random.seed(1)
-        return self.initializeParams([3,2,1])
